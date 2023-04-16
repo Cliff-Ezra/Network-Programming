@@ -5,7 +5,6 @@
 // Serial Number Program
 
 int main() {
-    // The file name is hard coded here, but you could ask the user for the file name
     std::string filename = "serial_numbers.txt";
     std::string serial_number;
 
