@@ -3,7 +3,7 @@
 The repository contains 2 folders:
 
 1. File Programs : Contains programs that save and retrieve data from files.
-2. Server Programs : Contains programs that use sockets to communicate between client and server.
+2. Server Programs : Contains programs that use sockets to communicate between client and server. {to be updated}
 
 ## How to Run
 
