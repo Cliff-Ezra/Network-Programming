@@ -34,7 +34,7 @@ The repository contains 2 folders:
 
 ## Contributors
 
-[Cliff Ezra](https://github.com/Cliff-Ezra), [Austin Ongwae](https://github.com/AustinOngwae), [Teddy Mwai](https://github.com/TedMwai), [Thon Peter](https://github.com/Thonpeter)
+[Cliff Ezra](https://github.com/Cliff-Ezra), [Austin Ongwae](https://github.com/AustinOngwae), [Teddy Mwai](https://github.com/TedMwai), [Elijah Ajak](https://github.com/ElijahAjak), [Thon Peter](https://github.com/Thonpeter)
 
 ## License
 
