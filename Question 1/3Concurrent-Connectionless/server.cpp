@@ -48,6 +48,9 @@ void* handle_client(void* arg) {
             break;
         }
 
+        // Print received data
+        std::cout << "Received data from client: " << std::string(buffer, bytes_received) << "\n";
+
         // Check if the client wants to exit
         if (std::string(buffer, bytes_received) == "exit") {
             break;
@@ -65,7 +68,7 @@ void* handle_client(void* arg) {
             }
         }
         infile.close();
-        if (!exists) {
+         if (!exists) {
             std::ofstream outfile(filename, std::ios_base::app);
             outfile << serial_number << "\n";
             outfile.close();
@@ -80,6 +83,10 @@ void* handle_client(void* arg) {
             std::cerr << "Failed to receive data from client\n";
             break;
         }
+
+        // Print received data
+        std::cout << "Received data from client: " << std::string(buffer, bytes_received) << "\n";
+
         registration_number = std::string(buffer, bytes_received);
         exists = false;
         infile.open(filename);
@@ -104,11 +111,15 @@ void* handle_client(void* arg) {
             std::cerr << "Failed to receive data from client\n";
             break;
         }
+
+        // Print received data
+        std::cout << "Received data from client: " << std::string(buffer, bytes_received) << "\n";
+
         name = std::string(buffer, bytes_received);
         std::ofstream outfile(filename, std::ios_base::app);
-        outfile << name << "\n";
+                outfile << name << "\n";
         outfile.close();
-         sendto(server_socket, "Name added.\n", 11, 0,(sockaddr*)&client_address,client_address_size);
+        sendto(server_socket, "Name added.\n", 11, 0,(sockaddr*)&client_address,client_address_size);
     }
 
     delete client_data;
@@ -147,6 +158,9 @@ int main() {
             std::cerr << "Failed to receive data from client\n";
             continue;
         }
+
+        // Print received data
+        std::cout << "Received data from client: " << std::string(buffer, bytes_received) << "\n";
 
         // Check if the client wants to exit
         if (std::string(buffer, bytes_received) == "exit") {

@@ -40,6 +40,9 @@ int main() {
             continue;
         }
 
+        // Print sent data
+        std::cout << "Sent data to server: " << serial_number << "\n";
+
         // Wait for response from server
         char buffer[1024];
         socklen_t server_address_size = sizeof(server_address);
@@ -64,6 +67,9 @@ int main() {
                 std::cerr << "Failed to send data to server\n";
                 break;
             }
+
+            // Print sent data
+            std::cout << "Sent data to server: " << registration_number << "\n";
 
             // Wait for response from server
             bytes_received = recvfrom(client_socket, buffer, sizeof(buffer), 0,(sockaddr*)&server_address,&server_address_size);
@@ -90,6 +96,9 @@ int main() {
             continue;
         }
 
+        // Print sent data
+        std::cout << "Sent data to server: " << name << "\n";
+
         // Wait for response from server
         bytes_received = recvfrom(client_socket, buffer, sizeof(buffer), 0,(sockaddr*)&server_address,&server_address_size);
         if (bytes_received == -1) {
@@ -105,3 +114,6 @@ int main() {
 
     return 0;
 }
+
+// Server Path:
+//  cd "/Users/ezra/Desktop/Development/School_Codes/Networking/Question 1/3Concurrent-Connectionless/" && g++ client.cpp -o client && "/Users/ezra/Desktop/Development/School_Codes/Networking/Question 1/3Concurrent-Connectionless/"server
