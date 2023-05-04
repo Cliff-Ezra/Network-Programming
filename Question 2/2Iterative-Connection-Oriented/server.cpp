@@ -43,6 +43,9 @@ int main() {
         return 1;
     }
 
+    // Log a message when a client connects
+    std::cout << "Client connected\n";
+
     // Read messages from the client
     char buffer[1024];
     while (true) {
