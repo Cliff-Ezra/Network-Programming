@@ -3,21 +3,17 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstring>
-#include <pthread.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
 
 struct ClientData {
     int client_socket;
     std::string filename;
-
-    ClientData(int client_socket, std::string filename)
-        : client_socket(client_socket), filename(filename) {}
+    ClientData(int client_socket, std::string filename) : client_socket(client_socket), filename(filename) {}
 };
 
-void* handle_client(void* arg) {
-    ClientData* client_data = (ClientData*)arg;
+void handle_client(ClientData* client_data) {
     int client_socket = client_data->client_socket;
     std::string filename = client_data->filename;
 
@@ -43,21 +39,11 @@ void* handle_client(void* arg) {
         // Perform the calculation
         int result;
         switch (op) {
-            case '+':
-                result = num1 + num2;
-                break;
-            case '-':
-                result = num1 - num2;
-                break;
-            case '*':
-                result = num1 * num2;
-                break;
-            case '/':
-                result = num1 / num2;
-                break;
-            default:
-                std::cerr << "Invalid operator: " << op << '\n';
-                continue;
+            case '+': result = num1 + num2; break;
+            case '-': result = num1 - num2; break;
+            case '*': result = num1 * num2; break;
+            case '/': result = num1 / num2; break;
+            default: std::cerr << "Invalid operator: " << op << '\n'; continue;
         }
 
         // Send the result back to the client
@@ -69,7 +55,6 @@ void* handle_client(void* arg) {
     // Close the socket
     close(client_socket);
     delete client_data;
-    return nullptr;
 }
 
 int main() {
@@ -112,11 +97,21 @@ int main() {
         // Log a message when a client connects
         std::cout << "Client connected\n";
 
-        // Create a thread to handle the client
-        pthread_t thread;
-        ClientData* client_data = new ClientData(client_socket, "");
-        pthread_create(&thread, nullptr, handle_client, client_data);
-        pthread_detach(thread);
+        // Create a new process to handle the client
+        pid_t pid = fork();
+        if (pid == -1) {
+            std::cerr << "Failed to fork\n";
+            continue;
+        } else if (pid == 0) {
+            // Child process
+            close(server_socket);
+            ClientData* client_data = new ClientData(client_socket, "");
+            handle_client(client_data);
+            exit(0);
+        } else {
+            // Parent process
+            close(client_socket);
+        }
     }
 
     // Close the socket
