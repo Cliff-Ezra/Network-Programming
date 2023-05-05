@@ -9,22 +9,18 @@
 
 int main() {
     // Create a socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int client_socket = socket(AF_INET, SOCK_DGRAM, 0);
     if (client_socket == -1) {
         std::cerr << "Failed to create socket\n";
         return 1;
     }
 
-    // Connect to the server
+    // Set the server address
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(9999);
     // Replace "SERVER_IP_ADDRESS" with the IP address of the server computer
     inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr);
-    if (connect(client_socket, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
-        std::cerr << "Failed to connect to server\n";
-        return 1;
-    }
 
     // Send messages to the server
     std::string message;
@@ -37,7 +33,7 @@ int main() {
 
         // Prompt the user to select an operator
         char op;
-        std::cout << "Select an operator from the list:\n";
+        std::cout << "Select an operator from the list:\n"; 
         std::cout << "1. Addition (+)\n";
         std::cout << "2. Subtraction (-)\n";
         std::cout << "3. Multiplication (*)\n";
@@ -64,7 +60,8 @@ int main() {
 
         // Send the message to the server
         message = std::to_string(num1) + ' ' + std::to_string(num2) + ' ' + op + '\n';
-        send(client_socket, message.c_str(), message.length(), 0);
+        sendto(client_socket, message.c_str(), message.length(), 0,
+               (sockaddr*)&server_address, sizeof(server_address));
 
         // Read the result from the server
         memset(buffer, 0, sizeof(buffer));

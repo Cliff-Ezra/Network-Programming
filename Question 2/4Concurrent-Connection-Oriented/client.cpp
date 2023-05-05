@@ -86,7 +86,7 @@ int main() {
         std::cout << "2. Exit the program\n";
         int option;
         std::cin >> option;
-        if (option == 2) {
+         if (option == 2) {
             break;
         }
     }
