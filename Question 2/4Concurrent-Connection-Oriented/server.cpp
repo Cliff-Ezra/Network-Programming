@@ -67,6 +67,9 @@ int main() {
         return 1;
     }
 
+    // Display the port the server is running on
+    std::cout << "Server running on port " << ntohs(server_address.sin_port) << '\n';
+
     // Listen for incoming connections
     if (listen(server_socket, 10) == -1) {
         std::cerr << "Failed to listen on socket\n";
