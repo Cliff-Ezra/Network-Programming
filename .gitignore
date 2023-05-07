@@ -4,4 +4,9 @@
 # Ignore object files
 *.o
 
+# Ignore C++ WSL executable
+*
+*/
+*.*
+
 tempCodeRunnerFile.cpp
