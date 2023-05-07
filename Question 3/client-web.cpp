@@ -9,7 +9,7 @@
 int main() {
     // Step 1: Include necessary libraries
     std::string url;
-    std::ofstream file("output.txt", std::ios::app); // Output file
+    std::ofstream file("websites.txt", std::ios::app); // Output file
 
     std::cout << "The URL entered should be in the format: www.example.com\n";
     std::cout << "Here are some sample URLs to use:\n";
