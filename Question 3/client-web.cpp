@@ -18,10 +18,8 @@ int main() {
     std::cout << "www.cnn.com\n";
     std::cout << "www.nationalgeographic.com\n";
     std::cout << "www.youtube.com\n";
-    std::cout << "www.facebook.com\n";
 
     while (true) {
-
         std::cout << "Enter a URL (or 'exit' to quit): ";
         std::getline(std::cin, url);
         if (url == "exit") break;
@@ -29,7 +27,6 @@ int main() {
         // Extract hostname from URL
         size_t pos = url.find('/');
         std::string hostname = (pos == std::string::npos) ? url : url.substr(0, pos);
-
         std::string request = "GET / HTTP/1.1\r\nHost: " + hostname + "\r\nConnection: close\r\n\r\n"; // HTTP GET request string
 
         // Step 2: Initialize Winsock (not necessary on macOS)
@@ -47,10 +44,12 @@ int main() {
             std::cerr << "Failed to resolve hostname\n";
             return -1;
         }
+
         struct sockaddr_in server_addr;
         server_addr.sin_family = AF_INET;
         server_addr.sin_port = htons(80);
         server_addr.sin_addr.s_addr = *((unsigned long *) host->h_addr);
+
         if (connect(sock, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
             std::cerr << "Failed to connect to server\n";
             return -1;
@@ -70,13 +69,14 @@ int main() {
         while ((bytes_received = recv(sock, buffer, BUFFER_SIZE, 0)) > 0) {
             response.append(buffer, bytes_received);
         }
+        
         if (bytes_received < 0) {
             std::cerr << "Failed to receive response\n";
             return -1;
         }
 
         // Step 7: Process the received data
-        file << "********************************************************************************************************************************\n";
+        file << "***********************************************************************************************************************************\n";
         file << response << "\n";
 
         // Step 8: Close the socket
@@ -84,6 +84,5 @@ int main() {
     }
 
     file.close();
-
     return 0;
 }
