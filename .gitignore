@@ -5,8 +5,7 @@
 *.o
 
 # Ignore C++ WSL executable
-# *
-# */
-# *.*
+/Question 4/Calculator/client
+/Question 4/Calculator/server
 
 tempCodeRunnerFile.cpp
