@@ -5,7 +5,8 @@
 *.o
 
 # Ignore C++ WSL executable
-*/
-*.*
+# *
+# */
+# *.*
 
 tempCodeRunnerFile.cpp
