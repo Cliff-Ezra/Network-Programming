@@ -5,7 +5,6 @@
 *.o
 
 # Ignore C++ WSL executable
-*
 */
 *.*
 
