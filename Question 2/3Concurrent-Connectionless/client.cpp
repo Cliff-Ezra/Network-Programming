@@ -20,7 +20,7 @@ int main() {
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(9999);
     // Replace "SERVER_IP_ADDRESS" with the IP address of the server computer
-    inet_pton(AF_INET, "192.168.1.11", &server_address.sin_addr);
+    inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr);
     if (connect(client_socket, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
         std::cerr << "Failed to connect to server\n";
         return 1;
