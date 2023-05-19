@@ -1,39 +1,55 @@
-#include <stdio.h>
 #include <rpc/rpc.h>
-#include <sys/socket.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define intrcvprog ((u_long)150000)
+#define strrcvprog ((u_long)150000)
 #define version ((u_long)1)
-#define intrcvproc ((u_long)1)
+#define strrcvproc ((u_long)1)
 
-bool_t xdr_input_data(
-    XDR *xdrs, struct {
-        int serial_number;
-        int registration_number;
-        char student_name[256];
-    } * data)
+struct input
 {
-    if (!xdr_int(xdrs, &data->serial_number))
+    int serial_num;
+    char *reg_num;
+    char *name;
+};
+
+bool_t xdr_input(XDR *xdrs, struct input *objp)
+{
+    if (!xdr_int(xdrs, &objp->serial_num))
     {
-        return FALSE;
+        return (FALSE);
     }
-    if (!xdr_int(xdrs, &data->registration_number))
+    if (!xdr_string(xdrs, &objp->reg_num, 512))
     {
-        return FALSE;
+        return (FALSE);
     }
-    if (!xdr_string(xdrs, &data->student_name, 256))
+    if (!xdr_string(xdrs, &objp->name, 512))
     {
-        return FALSE;
+        return (FALSE);
     }
-    return TRUE;
+    return (TRUE);
+}
+
+struct output
+{
+    int status;
+};
+
+bool_t xdr_output(XDR *xdrs, struct output *objp)
+{
+    if (!xdr_int(xdrs, &objp->status))
+    {
+        return (FALSE);
+    }
+    return (TRUE);
 }
 
 int main(int argc, char *argv[])
 {
-    int serial_number;
-    int registration_number;
+    struct input instrs;
+    struct output outstrs;
     int error;
-    int result;
 
     if (argc != 2)
     {
@@ -41,57 +57,42 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    printf("Enter Serial Number: ");
-    scanf("%d", &serial_number);
+    instrs.reg_num = (char *)malloc(512);
+    instrs.name = (char *)malloc(512);
 
-    printf("Enter Student Registration Number: ");
-    scanf("%d", &registration_number);
+    printf("Enter serial number: ");
+    scanf("%d", &instrs.serial_num);
+    printf("Enter registration number: ");
+    scanf("%s", instrs.reg_num);
+    printf("Enter name: ");
+    getchar();
+    fgets(instrs.name, 512, stdin);
+    instrs.name[strcspn(instrs.name, "\n")] = 0;
 
-    char *student_name = malloc(256 * sizeof(char));
-    if (student_name == NULL)
-    {
-        fprintf(stderr, "Error: Could not allocate memory for student name\n");
-        exit(1);
-    }
-
-    printf("Enter Student Name: ");
-    scanf("%s", student_name);
-    // append null character to the end of the string
-    student_name[255] = '\0';
-
-    struct
-    {
-        int serial_number;
-        int registration_number;
-        char student_name[256];
-    } indata = {serial_number, registration_number};
-
-    strcpy(indata.student_name, student_name);
-
-    error = callrpc(argv[1], intrcvprog, version, intrcvproc, xdr_input_data, (char *)&indata, xdr_int, (char *)&result);
+    /* Send the number and strings to the server. The server should
+     * return the status. */
+    error = callrpc(argv[1], strrcvprog, version, strrcvproc,
+                    (xdrproc_t)xdr_input, (char *)&instrs,
+                    (xdrproc_t)xdr_output, (char *)&outstrs);
     if (error != 0)
     {
         fprintf(stderr, "error: callrpc failed: %d \n", error);
-        fprintf(stderr, "intrcprog: %d version: %d intrcvproc: %d", intrcvprog, version, intrcvproc);
+        fprintf(stderr, "strcprog: %d version: %d strcvproc: %d",
+                strrcvprog, version, strrcvproc);
         exit(1);
     }
 
-    if (result == 0)
+    if (outstrs.status == 0)
     {
-        printf("Student details saved successfully\n");
+        printf("Student added successfully\n");
     }
-    else if (result == 1)
+    else
     {
-        printf("Error: Serial number already exists\n");
+        printf("Error adding student. Serial number or registration number already exists.\n");
     }
-    else if (result == 2)
-    {
-        printf("Error: Registration number already exists\n");
-    }
-    else if (result == 3)
-    {
-        printf("Error: Both serial number and registration number already exist\n");
-    }
+
+    free(instrs.reg_num);
+    free(instrs.name);
 
     exit(0);
 }

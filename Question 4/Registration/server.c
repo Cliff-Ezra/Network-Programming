@@ -1,108 +1,103 @@
-#ifndef MVS
-#define MVS
-#endif
-
 #include <rpc/rpc.h>
 #include <stdio.h>
 #include <string.h>
 
-#define intrcvprog ((u_long)150000)
-#define fltrcvprog ((u_long)150102)
-#define intvers ((u_long)1)
-#define intrcvproc ((u_long)1)
-#define fltrcvproc ((u_long)1)
-#define fltvers ((u_long)1)
+#define strrcvprog ((u_long)150000)
+#define strvers ((u_long)1)
+#define strrcvproc ((u_long)1)
 
-bool_t xdr_input_data(
-    XDR *xdrs, struct {
-        int serial_number;
-        int registration_number;
-        char student_name[256];
-    } * data)
+struct input
 {
-    if (!xdr_int(xdrs, &data->serial_number))
+    int serial_num;
+    char *reg_num;
+    char *name;
+};
+
+bool_t xdr_input(XDR *xdrs, struct input *objp)
+{
+    if (!xdr_int(xdrs, &objp->serial_num))
     {
-        return FALSE;
+        return (FALSE);
     }
-    if (!xdr_int(xdrs, &data->registration_number))
+    if (!xdr_string(xdrs, &objp->reg_num, 512))
     {
-        return FALSE;
+        return (FALSE);
     }
-    if (!xdr_string(xdrs, &data->student_name, 256))
+    if (!xdr_string(xdrs, &objp->name, 512))
     {
-        return FALSE;
+        return (FALSE);
     }
-    return TRUE;
+    return (TRUE);
 }
+
+struct output
+{
+    int status;
+};
+
+bool_t xdr_output(XDR *xdrs, struct output *objp)
+{
+    if (!xdr_int(xdrs, &objp->status))
+    {
+        return (FALSE);
+    }
+    return (TRUE);
+}
+
+struct output *strrcv(struct input *in);
 
 int main()
 {
-    int *intrcv();
+    /* REGISTER PROG, VERS AND PROC WITH THE PORTMAPPER */
+    registerrpc(strrcvprog, strvers, strrcvproc, strrcv,
+                (xdrproc_t)xdr_input, (xdrproc_t)xdr_output);
+    printf("Strrcv Registration with Port Mapper completed\n");
 
-    registerrpc(intrcvprog, intvers, intrcvproc, intrcv, xdr_input_data, xdr_int);
-    printf("Intrcv Registration with Port Mapper completed\n");
-
+    /* svc_run will handle all requests for programs registered. */
     svc_run();
     printf("Error:svc_run returned!\n");
     exit(1);
 }
 
-int *intrcv(struct {
-    int serial_number;
-    int registration_number;
-    char student_name[256];
-} * in)
+/* Procedure called by the server to receive and return a string. */
+struct output *strrcv(struct input *in)
 {
-    static int result;
+    static struct output out;
+    FILE *fp;
+    int found = 0;
+    int serial_num;
+    char reg_num[512];
+    char name[512];
 
-    FILE *file = fopen("Students.txt", "a+");
-    if (file == NULL)
+    printf("serial number received: %d\n", in->serial_num);
+    printf("registration number received: %s\n", in->reg_num);
+    printf("name received: %s\n", in->name);
+
+    fp = fopen("Students.txt", "r");
+    if (fp != NULL)
     {
-        fprintf(stderr, "Error: Could not open file\n");
-        exit(1);
-    }
-
-    int existing_serial_number;
-    int existing_registration_number;
-    char existing_student_name[256];
-    int serial_number_exists = 0;
-    int registration_number_exists = 0;
-
-    while (fscanf(file, "%d %d %s\n", &existing_serial_number, &existing_registration_number, existing_student_name) != EOF)
-    {
-        if (existing_serial_number == in->serial_number)
+        while (fscanf(fp, "%d %s %s\n", &serial_num, reg_num, name) != EOF)
         {
-            serial_number_exists = 1;
+            if (serial_num == in->serial_num || strcmp(reg_num, in->reg_num) == 0)
+            {
+                found = 1;
+                break;
+            }
         }
-        if (existing_registration_number == in->registration_number)
-        {
-            registration_number_exists = 1;
-        }
-        if (serial_number_exists && registration_number_exists)
-        {
-            break;
-        }
+        fclose(fp);
     }
 
-    if (serial_number_exists && registration_number_exists)
+    if (!found)
     {
-        result = 3;
-    }
-    else if (serial_number_exists)
-    {
-        result = 1;
-    }
-    else if (registration_number_exists)
-    {
-        result = 2;
+        fp = fopen("Students.txt", "a");
+        fprintf(fp, "%d\t\t %s\t\t %s\t\t\n", in->serial_num, in->reg_num, in->name);
+        fclose(fp);
+        out.status = 0; // success
     }
     else
     {
-        fprintf(file, "%d %d %s\n", in->serial_number, in->registration_number, in->student_name);
-        result = 0;
+        out.status = 1; // failure
     }
 
-    fclose(file);
-
-    return &result;
+    return &out;
 }
