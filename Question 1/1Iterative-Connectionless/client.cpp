@@ -160,5 +160,3 @@ int readRegistrationNumber(int client_socket, sockaddr_in server_address, sockle
     }
     return 0;
 }
-// Server Path
-// "/Users/ezra/Desktop/Development/School_Codes/Networking/Question 1/1Iterative-Connectionless/" && g++ server.cpp -o server && "/Users/ezra/Desktop/Development/School_Codes/Networking/Question 1/1Iterative-Connectionless/"server
