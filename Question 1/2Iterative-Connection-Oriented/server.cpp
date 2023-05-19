@@ -35,7 +35,7 @@ int main() {
 
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(3000);
+    server_address.sin_port = htons(4000);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(server_socket, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
@@ -49,7 +49,7 @@ int main() {
         return 1;
     }
 
-    std::cout << "Server listening on port 3000\n";
+    std::cout << "Server listening on port 4000\n";
 
     while (true) {
         // Create another (normal) socket and build a TCP connection when a request arrives
