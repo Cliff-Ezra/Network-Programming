@@ -20,7 +20,7 @@ int main()
 
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(3000);
+    server_address.sin_port = htons(4000);
     server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(client_socket, (sockaddr *)&server_address, sizeof(server_address)) == -1)
@@ -160,6 +160,3 @@ int readRegistrationNumber(int client_socket)
     }
     return 0;
 }
-
-// Server path:
-// cd "/Users/ezra/Desktop/Development/School_Codes/Networking/Question 1/4Concurrent-Connection-Oriented/" && g++ server.cpp -o server && "/Users/ezra/Desktop/Development/School_Codes/Networking/Question 1/4Concurrent-Connection-Oriented/"server
