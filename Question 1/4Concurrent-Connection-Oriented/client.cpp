@@ -87,7 +87,7 @@ int main()
     return 0;
 }
 
-// function to read the serail number from the client
+// function to read the serial number from the client
 int readSerialNumber(int client_socket)
 {
     std::string serial_number;
