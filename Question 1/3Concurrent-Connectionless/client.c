@@ -1,5 +1,6 @@
-#include <iostream>
-#include <cstring>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -33,14 +34,14 @@ int main()
 
     // Read student data from user
     struct student new_student;
-    std::cout << "Enter serial number: ";
-    std::cin >> new_student.serial_number;
-    std::cout << "Enter registration number: ";
-    std::cin >> new_student.reg_number;
-    std::cout << "Enter first name: ";
-    std::cin >> new_student.first_name;
-    std::cout << "Enter last name: ";
-    std::cin >> new_student.last_name;
+    printf("Enter serial number: ");
+    scanf("%d", &new_student.serial_number);
+    printf("Enter registration number: ");
+    scanf("%s", new_student.reg_number);
+    printf("Enter first name: ");
+    scanf("%s", new_student.first_name);
+    printf("Enter last name: ");
+    scanf("%s", new_student.last_name);
 
     // Send student data to server
     sendto(client_socket, (void *)&new_student, sizeof(new_student), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
@@ -49,7 +50,7 @@ int main()
     char response[100];
     socklen_t server_addr_len = sizeof(server_addr);
     recvfrom(client_socket, response, sizeof(response), 0, (struct sockaddr *)&server_addr, &server_addr_len);
-    std::cout << response << "\n";
+    printf("%s\n", response);
 
     // Close socket
     close(client_socket);
